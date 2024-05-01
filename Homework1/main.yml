@@ -1,0 +1,48 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update package cache and install packages
+      apt:
+        name:
+          - apache2
+          - git
+          - tree
+        state: present
+        update_cache: yes
+
+    - name: Ensure Apache is started and enabled
+      systemd:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Create group 'kaizen'
+      group:
+        name: kaizen
+        state: present
+
+    - name: Create group 'devops'
+      group:
+        name: devops
+        state: present
+
+    - name: Create group 'qa'
+      group:
+        name: qa
+        state: present
+
+    - name: Add the user 'tester' to the group 'qa'
+      user:
+        name: tester
+        group: qa
+
+    - name: Add the user 'valeriiababina' , appending the group 'qa' and 'kaizen' to the user's groups
+      user:
+        name: valeriiababina
+        groups: qa,kaizen
+        append: yes
+    
+    - name: Copy files from Homework1 to remote machine
+      copy:
+        src: "./"
+        dest: /root/
